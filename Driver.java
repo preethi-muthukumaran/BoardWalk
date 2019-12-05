@@ -37,57 +37,30 @@ import javax.sound.midi.Sequencer;
 
 public class Driver extends JPanel implements ActionListener, KeyListener, MouseListener, MouseMotionListener {
 	public static int life = 3; // don't know what this does yet
-
+	
+	//screen attributes
 	int screen_width = 800;
 	int screen_height = 600;
-	
-	//scores
-	int score = 0;
 
 	String src = new File("").getAbsolutePath() + "/src/"; // path to image
 	Clip hop;
-
+	
+	//Object creation + instantiation
 	Background background1 = new Background("background.jpg", 0, 0);
-	Background background2 = new Background("background.jpg", screen_width, 0);
+    Background background2 = new Background("background.jpg", screen_width, 0);
 	Seagull s = new Seagull("seagull.gif", 400, 300);
-	People[] people = new People[2];
-	Lives[] heart = new Lives[3];
-	Rocks[] rocks = new Rocks [4];
-	Clouds[] cloud = new Clouds [2];
-
-
-// clip.open(audioInputStream);
+	People[] people = new People [4];
+	
+	//clip.open(audioInputStream); //what is this
 	Sequencer sequencer;
-// Background bg;
+	Background bg; //what is this?
 	int my_variable = 0; // example
+
 	String lost = "";
-
-// method to instantiate people objects
-	public void loadPeople() {
-// traverse each spot in people array
-// fill it with images + location
-// int ranX1 = (int) (Math.random() * (800) + 0); // random initial x within
-// screen_width
-// int ranX2 = (int) (Math.random() * (800) + 800); // random initial x inside
-// screen_width + 800
-
-		people[0] = new People("people.gif", 50, 300);
-		people[1] = new People("people.gif", 100, 350);
-
-	}
-
-	public void loadLives() {
-		heart[0] = new Lives("heart.png", 700, 5);
-		heart[1] = new Lives("heart.png", 730, 5);
-		heart[2] = new Lives("heart.png", 760, 5);
-
-	}
-	
-	public void loadClouds() {
-		cloud[0] = new Clouds("cloud.png", 600, 100);
-		cloud[1] = new Clouds("cloud.png", 500, 300);
-	}
-	
+	int coll_cntr = 0;
+	boolean coll_heart3 = false; //does this automate to public?
+	boolean coll_heart2 = false; //does this automate to public?
+	boolean coll_heart1 = false; //does this automate to public?
 
 	public void paint(Graphics g) {
 
@@ -101,84 +74,24 @@ public class Driver extends JPanel implements ActionListener, KeyListener, Mouse
 		background1.paint(g);
 		background2.paint(g);
 		s.paint(g);
-		
-		//scoring stuff
-		g.setColor(Color.WHITE);
-		g.setFont(new Font("CourierNew", 0, 20));
-		g.drawString("Score: " + score, 705, 50);
 
-
-// paint people object
-// future objective: potentially, only paint them when they are active
-
+		//paint all people
 		for (int i = 0; i < people.length; i++) {
 			people[i].paint(g);
 		}
-
-		for (int i = 0; i < heart.length; i++) {
-			heart[i].paint(g);
-		}
-
-		
-		for (int i = 0; i < rocks.length; i++) {
-			rocks[i].paint(g);
-		}
-		
-		for (int i = 0; i < cloud.length; i++) {
-			cloud[i].paint(g);
-		}
-
-
 	}
 
 	Font font = new Font("Courier New", 1, 50);
 	Font font2 = new Font("Courier New", 1, 30);
 
-// method to tile background
-	public void tileBackground() {
-		background1.backMove();
-		background2.backMove();
-
-		if (background1.getBx() <= -800) {
-			background1.setBx(screen_width);
-		}
-		if (background2.getBx() <= -800) {
-			background2.setBx(screen_width);
-		}
-
-	}
-
-// method to tile people
-	public void tilePeople() {
+	// loadPeople method - instantiate people objects with image + loc
+	public void loadPeople() {
+		int person_start = 100;
 		for (int i = 0; i < people.length; i++) {
-			people[i].movePeople();
+			people[i] = new People("people3.gif", person_start, 440);
+			person_start += 200;
 		}
-// if people go off screen, make them reaapea in a random
-// loc in second pane
-		for (int i = 0; i < people.length; i++) {
-			if (people[i].getPplx() == -50) {
-				people[i].setPplx((int) (Math.random() * (800) + 800));
-			}
-		}
-
 	}
-	
-	public void tileClouds() {
-		for (int i = 0; i < cloud.length; i++) {
-			cloud[i].moveClouds();
-		}
-		for (int i = 0; i < cloud.length; i++) {
-			if (cloud[i].getCx() == -50) {
-				cloud[i].setCx((int) (Math.random() * (800) + 800));
-			}
-		}
-
-	}
-	
-
-	
-
-// move
 
 	public void update() {
 		s.updateSeagull();
@@ -188,36 +101,38 @@ public class Driver extends JPanel implements ActionListener, KeyListener, Mouse
 		background2.backMove();
 		background1.tileBackground();
 		background2.tileBackground();
-
+		
 		for (int i = 0; i < people.length; i++) {
-
 			people[i].movePeople();
 			people[i].tilePeople();
 			people[i].updatePeople();
 		}
-		
-		for (int i = 0; i < cloud.length; i++) {
 
-			cloud[i].moveClouds();
-			cloud[i].tileClouds();
-			cloud[i].updateClouds();
-		}
-
-		for (int i = 0; i < heart.length; i++) {
-			heart[i].updateLives();
-		}
-		
-		//send Seagull object to one of the enemies
+		//Collision
+		//Send seagull object to one of the enemies
 		//through a method call (collided method)
 		
-	for (int i = 0; i < rocks.length; i++) {
-			if(rocks[i].collided(s)) {
-				//right now -> exits if collided with projectiles
-				System.out.println("ouch");
-				score += 1; 
-			}
-		} 
+		//new - might need to delete 12/4
+		//create public boolean var that checks if collided, if so,
+		//in background, make third  heart active false
+		//which will stop painting heart in background
+		if(people[0].collided(s)) { //how to do for all people??
+			System.out.println("ouch"); //now make score increase
+			coll_cntr++;
+		}
 		
+		if(coll_cntr == 1) {
+			coll_heart3 = true; //now need to stop painting third heart in background
+		}
+		
+		if(coll_cntr == 2) {
+			coll_heart2 = true; //now need to stop painting second heart in background
+		}
+		
+		if(coll_cntr == 3) {
+			coll_heart1 = true; //now need to stop painting first heart in background
+		}
+
 	}
 
 	@Override
@@ -239,45 +154,39 @@ public class Driver extends JPanel implements ActionListener, KeyListener, Mouse
 		f.addKeyListener(this);
 		f.addMouseListener(this);
 		f.addMouseMotionListener(this);
+		
+		//call loadPeople here to instantiate the people array
 		loadPeople();
-		loadLives();
-		loadClouds();
+		
 
-
-		 for (int i = 0; i < rocks.length; i++) { 
-			 rocks[i] = new Rocks ("rocks.png",
-			 (int) (Math.random() * (600)), (int) (Math.random() * (600))); 
-			 }
-		 
-
-// Obtains the default Sequencer connected to a default device.
+		// Obtains the default Sequencer connected to a default device.
 		try {
 			sequencer = MidiSystem.getSequencer();
-// Opens the device, indicating that it should now acquire any
-// system resources it requires and become operational.
+			// Opens the device, indicating that it should now acquire any
+			// system resources it requires and become operational.
 			sequencer.open();
 
-// create a stream from a file
+			// create a stream from a file
 
 			InputStream is = new BufferedInputStream(
 					new FileInputStream(new File("Thelazysong.mid").getAbsoluteFile()));
 
-// Sets the current sequence on which the sequencer operates.
-// The stream must point to MIDI file data.
+			// Sets the current sequence on which the sequencer operates.
+			// The stream must point to MIDI file data.
 			sequencer.setSequence(is);
 
-// Starts playback of the MIDI data in the currently loaded
-// sequence.
+			// Starts playback of the MIDI data in the currently loaded
+			// sequence.
 
 		} catch (Exception e) {
-// TODO Auto-generated catch block
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-// player.addMouseListener(this);
-// bg = new Background("background.png");
-// do not add to frame, call paint on
-// these objects in paint method
+		// player.addMouseListener(this);
+		// bg = new Background("background.png");
+		// do not add to frame, call paint on
+		// these objects in paint method
 
 		f.add(this);
 		t = new Timer(16, this);
@@ -290,14 +199,7 @@ public class Driver extends JPanel implements ActionListener, KeyListener, Mouse
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == 87){
-			s.setSx(s.getSx()+100);
-			s.setSy(s.getSy()+100);
-			}
-		if (e.getKeyCode() == 83){
-			s.setSx(s.getSx()+100);
-			s.setSy(s.getSy()+100);
-			}
+
 	}
 
 	@Override
@@ -307,7 +209,7 @@ public class Driver extends JPanel implements ActionListener, KeyListener, Mouse
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 		System.out.println(e.getKeyCode());
 
 	}
@@ -336,14 +238,46 @@ public class Driver extends JPanel implements ActionListener, KeyListener, Mouse
 	@Override
 	public void mousePressed(MouseEvent e) {
 
-		s.fire();
+		s.fireProjectile();
 
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
 
+	}
+
+	public int getColl_cntr() {
+		return coll_cntr;
+	}
+
+	public void setColl_cntr(int coll_cntr) {
+		this.coll_cntr = coll_cntr;
+	}
+
+	public boolean isColl_heart3() {
+		return coll_heart3;
+	}
+
+	public void setColl_heart3(boolean coll_heart3) {
+		this.coll_heart3 = coll_heart3;
+	}
+
+	public boolean isColl_heart2() {
+		return coll_heart2;
+	}
+
+	public void setColl_heart2(boolean coll_heart2) {
+		this.coll_heart2 = coll_heart2;
+	}
+
+	public boolean isColl_heart1() {
+		return coll_heart1;
+	}
+
+	public void setColl_heart1(boolean coll_heart1) {
+		this.coll_heart1 = coll_heart1;
 	}
 
 	@Override
@@ -353,27 +287,16 @@ public class Driver extends JPanel implements ActionListener, KeyListener, Mouse
 	@Override
 	public void mouseMoved(MouseEvent m) {
 
-// this method is triggered anytime there is
-// mouse movement on the frame
-		s.setSx(m.getX() - s.getSw() / 2);
-		s.setSy(m.getY() - s.getSh() * 2);
+		// this method is triggered anytime there is
+		// mouse movement on the frame
+		s.setX(m.getX() - s.getW() / 2);
+		s.setY(m.getY() - s.getH() * 2);
 
 	}
 
-	public Background getBackground1() {
-		return background1;
-	}
+	
 
-	public void setBackground1(Background background1) {
-		this.background1 = background1;
-	}
-
-	public Background getBackground2() {
-		return background2;
-	}
-
-	public void setBackground2(Background background2) {
-		this.background2 = background2;
-	}
+	
+	
 
 }
