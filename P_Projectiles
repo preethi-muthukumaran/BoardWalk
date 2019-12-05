@@ -1,0 +1,135 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.net.URL;
+
+public class Projectile {
+	//Attributes: position, size, velocity, active status (bool)
+	private int x, y, w, h, vx, vy;
+	
+	public boolean active = false; //checks if projectile is live (paint, fire)
+	
+	//Image, location tracker attributes
+	private Image sImage;
+	private AffineTransform tx = AffineTransform.getTranslateInstance(x, y);
+
+	//Default ProjectileConstructor: image
+	public Projectile(String fileName) {
+		x = 400;
+		y = 300;
+		w = 100;
+		h = 100;
+		vy = 0;
+
+		//call updateProjectile every time x and y change
+		sImage = getImage(fileName);
+		updateProjectile();
+	}
+
+	//Projectile Constructor: location and image specific
+	public Projectile(String fileName, int paramSx, int paramSy) {
+		x = paramSx;
+		y = paramSy;
+		w = 175;
+		h = 75;
+		vy = 0;
+
+		// call updateProjectile every time x and y change
+		sImage = getImage(fileName);
+		updateProjectile();
+	}
+
+	// draw the affinetransform
+	public void paint(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		g2.drawImage(sImage, tx, null); // draws GIF
+		y += vy; 
+		updateProjectile(); //called because location changes
+
+	}
+	
+	// updateProjectile method: track position/location of projectile
+	public void updateProjectile() {
+		tx.setToTranslation(x, y); // updates position of Seagull x and y
+	}
+
+	//Image method
+	// converts image to make it drawable in paint
+	private Image getImage(String path) {
+		Image tempImage = null;
+		try {
+			URL imageURL = Projectile.class.getResource(path);
+			tempImage = Toolkit.getDefaultToolkit().getImage(imageURL);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tempImage;
+	}
+	
+	//Collision for projectiles
+	public boolean collided(Seagull s) {
+		Rectangle pRect = new Rectangle(x, y, 25, 25); // projectile
+		Rectangle sRect = new Rectangle(s.getX(), s.getY(), 200, 250); // seagull
+		return pRect.intersects(sRect);
+
+	}
+
+	// Getters/Setters: position, size, velocity
+	
+	//Position: x, y --> track, collision
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	//Size: w, h --> collision
+	public int getW() {
+		return w;
+	}
+
+	public void setW(int w) {
+		this.w = w;
+	}
+
+	public int getH() {
+		return h;
+	}
+
+	public void setH(int h) {
+		this.h = h;
+	}
+	
+	//Velocity: vx, vy --> fall/ejecting 
+
+	public int getVx() {
+		return vx;
+	}
+
+	public void setVx(int vx) {
+		this.vx = vx;
+	}
+	
+	public int getVy() {
+		return vy;
+	}
+
+	public void setVy(int vy) {
+		this.vy = vy;
+	}
+
+
+}
