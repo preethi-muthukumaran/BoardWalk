@@ -1,0 +1,150 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.net.URL;
+
+public class Seagull {
+	// Attributes: location, size
+
+	private int x, y, w, h;
+	//Image and tracking attributes
+	private Image sImage;
+	private AffineTransform tx = AffineTransform.getTranslateInstance(x, y);
+
+	//Other Objects: projectiles
+	Projectile[] projectile = new Projectile[10];
+	
+	
+	// Default Seagull Constructor: image
+	public Seagull(String fileName) {
+		x = 400;
+		y = 300;
+		w = 100;
+		h = 100;
+		
+		//call the projectiles
+		loadProjectile();
+
+		//call updateSeagull whenever changing Seagull x and y
+		sImage = getImage(fileName);
+		updateSeagull();
+	}
+
+	// Seagull Constructor: location and image specific
+	public Seagull(String fileName, int paramSx, int paramSy) {
+		x = paramSx;
+		y = paramSy;
+		w = 175;
+		h = 75;
+		
+		//call the projectiles
+		loadProjectile();
+		
+		//call updateSeagull whenever changing Seagull x and y
+		sImage = getImage(fileName);
+		updateSeagull();
+
+	}
+
+	// paint method
+	// draw the affinetransform
+	public void paint(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		g2.drawImage(sImage, tx, null); // draws GIF
+		
+		//draw active missiles
+		for(int i = 0; i < projectile.length; i++) {
+			if(projectile[i].active) {
+				projectile[i].paint(g);
+			}
+			
+			//figure out how to deactivate
+			//a projectile when it is off the screen
+		}
+	
+	}		
+
+	// updateSeagull method - called everytime Seagull object x and y change
+	public void updateSeagull() {
+		tx.setToTranslation(x, y); 
+	}
+
+	// Image method
+	// converts image to make it drawable in paint
+	private Image getImage(String path) {
+		Image tempImage = null;
+		try {
+			URL imageURL = Seagull.class.getResource(path);
+			tempImage = Toolkit.getDefaultToolkit().getImage(imageURL);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tempImage;
+	}
+	
+	// loadProjectile method: instantiate all projectile objects
+	public void loadProjectile() {
+		for(int i = 0; i < projectile.length; i++) {
+			projectile[i] = new Projectile("banana.gif");
+		}
+	}
+	
+	// fireProjectile method: firing projectiles
+	public void fireProjectile() {
+		for(int i = 0; i < projectile.length; i++) {
+			if(!projectile[i].active) {
+				projectile[i].active = true;
+				
+				//set position
+				projectile[i].setX(x+45);
+				projectile[i].setY(y+90);
+				
+				//set velocities
+				projectile[i].setVy(10);
+				projectile[i].setVx(x);
+				
+				break;
+			}
+		}
+	}
+
+	
+	// Getters/Setters
+	
+	//Position: x, y --> Track Seagull object + Mouse control
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+	//Size: w, h --> Mouse control
+	public int getW() {
+		return w;
+	}
+
+	public void setW(int w) {
+		this.w = w;
+	}
+
+	public int getH() {
+		return h;
+	}
+
+	public void setH(int h) {
+		this.h = h;
+	}
+
+}
