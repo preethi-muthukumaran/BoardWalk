@@ -1,0 +1,95 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.net.URL;
+
+public class Heart {
+	//Attributes: position, size
+	private int x, y, w, h;
+	private Image sImage;
+	private AffineTransform tx = AffineTransform.getTranslateInstance(x, y);
+	
+	//active status
+	//deafult is true, whenever hit by weapon, becomes false
+	public boolean activeHeart = true;
+	
+	//Heart Constructor: image and location specific
+	public Heart(String fileName, int paramX, int paramY) {
+		x = paramX;
+		y = paramY;
+		w = 50;
+		h = 50;
+		
+		sImage = getImage(fileName);
+		
+	}
+	
+	//paint method
+	public void paint(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		g2.drawImage(sImage, tx, null); // draws GIF
+		
+		updateHeart(); //don't know why I would need this
+
+	
+		}
+	
+	//updateHeart method
+	public void updateHeart() {
+		tx.setToTranslation(x, y);
+	}
+
+	// Image method
+	// converts image to make it drawable in paint
+	private Image getImage(String path) {
+		Image tempImage = null;
+		try {
+			URL imageURL = Heart.class.getResource(path); //or is it Seagull.class
+			tempImage = Toolkit.getDefaultToolkit().getImage(imageURL);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tempImage;
+	}
+	
+	//Getters/Settes: position, size
+	
+	//Position
+	public int getX() {
+		return x;
+	}
+	
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	public int getY() {
+		return y;
+	}
+	
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+	//Size: w, h
+	public int getW() {
+		return w;
+	}
+	
+	public void setW(int w) {
+		this.w = w;
+	}
+	
+	public int getH() {
+		return h;
+		
+	}
+	
+	public void setH(int h) {
+		this.h = h;
+	}
+
+}	
+
